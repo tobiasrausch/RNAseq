@@ -1,6 +1,7 @@
 genome/
 example/
 exon/
+gtf/
 
 # Prerequisites
 *.d
