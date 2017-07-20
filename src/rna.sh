@@ -56,8 +56,9 @@ for CHR in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y
 do
     sed -i "s/SN:${CHR}\t/SN:chr${CHR}\t/" ${OP}.header
 done
+cat ${OP}.header | grep -v -P "^@SQ\tSN:[A-Z]" > ${OP}.header.tmp
+mv ${OP}.header.tmp ${OP}.header
 samtools reheader ${OP}.header ${OP}.star.bam > ${OP}.star.tmp.bam
 mv ${OP}.star.tmp.bam ${OP}.star.bam
 samtools index ${OP}.star.bam
 rm ${OP}.header
-
