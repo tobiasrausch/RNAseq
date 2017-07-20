@@ -50,6 +50,11 @@ samtools view -b ${OP}.star.bam 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 
 mv ${OP}.star.tmp.bam ${OP}.star.bam
 samtools index ${OP}.star.bam
 
+# Basic alignment QC
+samtools idxstats ${OP}.star.bam > ${OP}.idxstats
+samtools flagstat ${OP}.star.bam > ${OP}.flagstat
+alfred -r ${HG} -b ${BASEDIR}/../exon/exonic.hg19.bed.gz -o ${OP}.alfred ${OP}.star.bam
+
 # Fix chromosome names
 samtools view -H ${OP}.star.bam > ${OP}.header
 for CHR in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y
