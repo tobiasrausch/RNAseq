@@ -53,7 +53,7 @@ samtools index ${OP}.star.bam
 # Basic alignment QC
 samtools idxstats ${OP}.star.bam > ${OP}.idxstats
 samtools flagstat ${OP}.star.bam > ${OP}.flagstat
-alfred -r ${HG} -b ${BASEDIR}/../exon/exonic.hg19.bed.gz -o ${OP}.alfred ${OP}.star.bam
+#alfred -r ${HG} -b ${BASEDIR}/../exon/exonic.hg19.bed.gz -o ${OP}.alfred ${OP}.star.bam
 
 # Fix chromosome names
 samtools view -H ${OP}.star.bam > ${OP}.header
@@ -63,7 +63,6 @@ do
 done
 cat ${OP}.header | grep -v -P "^@SQ\tSN:[A-Z]" > ${OP}.header.tmp
 mv ${OP}.header.tmp ${OP}.header
-samtools reheader ${OP}.header ${OP}.star.bam > ${OP}.star.tmp.bam
-mv ${OP}.star.tmp.bam ${OP}.star.bam
-samtools index ${OP}.star.bam
+samtools reheader ${OP}.header ${OP}.star.bam > ${OP}.star.chr.bam
+samtools index ${OP}.star.chr.bam
 rm ${OP}.header
