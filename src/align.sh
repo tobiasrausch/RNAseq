@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]
+if [ $# -lt 2 ]
 then
     echo "**********************************************************************"
     echo "RNA-Seq processing pipeline"
@@ -9,7 +9,7 @@ then
     echo "Contact: Tobias Rausch (rausch@embl.de)"
     echo "**********************************************************************"
     echo ""
-    echo "Usage: $0 <read1.fq.gz> <read2.fq.gz> <outprefix>"
+    echo "Usage: $0 <outprefix> <read1.fq.gz> [<read2.fq.gz>]"
     echo ""
     exit -1
 fi
@@ -21,19 +21,32 @@ export PATH=/g/funcgen/bin/:${PATH}
 
 # CMD params
 THREADS=4
-FQ1=${1}
-FQ2=${2}
-OP=${3}
+OP=${1}
+FQ1=${2}
+PE=0
+if [ $# -eq 3 ]
+then
+    PE=1
+    FQ2=${3}
+fi
 HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 
 # Fastqc
 mkdir -p ${OP}.read1.fastqc/
 fastqc -t ${THREADS} -o ${OP}.read1.fastqc/ ${FQ1}
-mkdir -p ${OP}.read2.fastqc/
-fastqc -t ${THREADS} -o ${OP}.read2.fastqc/ ${FQ2}
+if [ ${PE} -eq 1 ]
+then
+    mkdir -p ${OP}.read2.fastqc/
+    fastqc -t ${THREADS} -o ${OP}.read2.fastqc/ ${FQ2}
+fi
 
 # STAR alignment
-STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} ${FQ2} --readFilesCommand zcat
+if [ ${PE} -eq 1 ]
+then
+    STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} ${FQ2} --readFilesCommand zcat
+else
+    STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} --readFilesCommand zcat
+fi
 rm -rf ${OP}.tmpSTAR*
 
 # Convert to BAM
@@ -53,7 +66,10 @@ samtools index ${OP}.star.bam
 # Basic alignment QC
 samtools idxstats ${OP}.star.bam > ${OP}.idxstats
 samtools flagstat ${OP}.star.bam > ${OP}.flagstat
-#alfred -r ${HG} -b ${BASEDIR}/../exon/exonic.hg19.bed.gz -o ${OP}.alfred ${OP}.star.bam
+
+# Run QC and gene counting using Alfred
+alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
+alfred count_rna -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
 
 # Fix chromosome names
 samtools view -H ${OP}.star.bam > ${OP}.header
@@ -65,4 +81,6 @@ cat ${OP}.header | grep -v -P "^@SQ\tSN:[A-Z]" > ${OP}.header.tmp
 mv ${OP}.header.tmp ${OP}.header
 samtools reheader ${OP}.header ${OP}.star.bam > ${OP}.star.chr.bam
 samtools index ${OP}.star.chr.bam
-rm ${OP}.header
+rm ${OP}.header 
+
+
