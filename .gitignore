@@ -1,7 +1,6 @@
 rna.slurm_submit.sh
 genome/
 example/
-exon/
 gtf/
 
 # Prerequisites
