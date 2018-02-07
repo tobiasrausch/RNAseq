@@ -13,10 +13,18 @@ Download the GTF annotation file
 
 `cd gtf/ && ./downloadGTF.sh`
 
-Example
--------
+
+
+RNA-Seq Alignment and Gene Counting
+-----------------------------------
+
+`./src/align.sh HG00096 ERR188040_1.fastq.gz ERR188040_2.fastq.gz`
+
+
+Example Workflow
+----------------
 
 Align one sample from the gEUVADIS data set
 
-`./gEUVADIS.sh`
+`cd example/ && ./gEUVADIS.sh`
 
