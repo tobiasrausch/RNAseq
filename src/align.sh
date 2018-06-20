@@ -2,14 +2,8 @@
 
 if [ $# -lt 2 ]
 then
-    echo "**********************************************************************"
-    echo "RNA-Seq processing pipeline"
-    echo "This program comes with ABSOLUTELY NO WARRANTY."
     echo ""
-    echo "Contact: Tobias Rausch (rausch@embl.de)"
-    echo "**********************************************************************"
-    echo ""
-    echo "Usage: $0 <outprefix> <read1.fq.gz> [<read2.fq.gz>]"
+    echo "Usage: $0 <read1.fq.gz> <read2.fq.gz> <output prefix>"
     echo ""
     exit -1
 fi
@@ -17,36 +11,25 @@ fi
 SCRIPT=$(readlink -f "$0")
 BASEDIR=$(dirname "$SCRIPT")
 
-export PATH=/g/funcgen/bin/:${PATH}
+# Activate environment
+export PATH=${BASEDIR}/../bin/bin:${PATH}
+source activate ${BASEDIR}/../bin/envs/rna
 
 # CMD params
 THREADS=4
-OP=${1}
-FQ1=${2}
-PE=0
-if [ $# -eq 3 ]
-then
-    PE=1
-    FQ2=${3}
-fi
+FQ1=${1}
+FQ2=${2}
+OP=${3}
 HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 
 # Fastqc
 mkdir -p ${OP}.read1.fastqc/
 fastqc -t ${THREADS} -o ${OP}.read1.fastqc/ ${FQ1}
-if [ ${PE} -eq 1 ]
-then
-    mkdir -p ${OP}.read2.fastqc/
-    fastqc -t ${THREADS} -o ${OP}.read2.fastqc/ ${FQ2}
-fi
+mkdir -p ${OP}.read2.fastqc/
+fastqc -t ${THREADS} -o ${OP}.read2.fastqc/ ${FQ2}
 
 # STAR alignment
-if [ ${PE} -eq 1 ]
-then
-    STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} ${FQ2} --readFilesCommand zcat
-else
-    STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} --readFilesCommand zcat
-fi
+STAR --runThreadN ${THREADS} --outFileNamePrefix ${OP}.star --outTmpDir ${OP}.tmpSTAR --genomeDir ${BASEDIR}/../genome/ --readFilesIn ${FQ1} ${FQ2} --readFilesCommand zcat
 rm -rf ${OP}.tmpSTAR*
 
 # Convert to BAM
@@ -70,7 +53,10 @@ samtools flagstat ${OP}.star.bam > ${OP}.flagstat
 # Run QC and gene counting using Alfred
 alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
 alfred count_rna -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
+
+# Create browser tracks
 alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
+igvtools totdf ${OP}.bedGraph.gz ${OP}.tdf hg19
 
 # Fix chromosome names
 samtools view -H ${OP}.star.bam > ${OP}.header
@@ -84,4 +70,5 @@ samtools reheader ${OP}.header ${OP}.star.bam > ${OP}.star.chr.bam
 samtools index ${OP}.star.chr.bam
 rm ${OP}.header 
 
-
+# Deactivate environment
+source deactivate

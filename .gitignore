@@ -1,7 +1,12 @@
 rna.slurm_submit.sh
+.channels
+.conda
+.envs
+bin/
 genome/
 example/
 gtf/
+*~
 
 # Prerequisites
 *.d
