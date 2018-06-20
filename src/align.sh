@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -lt 2 ]
+if [ $# -ne 3 ]
 then
     echo ""
     echo "Usage: $0 <read1.fq.gz> <read2.fq.gz> <output prefix>"
