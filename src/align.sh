@@ -70,6 +70,7 @@ samtools flagstat ${OP}.star.bam > ${OP}.flagstat
 # Run QC and gene counting using Alfred
 alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
 alfred count_rna -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
+alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
 
 # Fix chromosome names
 samtools view -H ${OP}.star.bam > ${OP}.header
