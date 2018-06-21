@@ -2,6 +2,7 @@ rna.slurm_submit.sh
 .channels
 .conda
 .envs
+.eagle
 bin/
 genome/
 refpanel/
