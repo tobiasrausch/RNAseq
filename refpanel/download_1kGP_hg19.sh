@@ -1,6 +1,11 @@
 #!/bin/bash
 
-export PATH=/g/funcgen/bin:${PATH}
+SCRIPT=$(readlink -f "$0")
+BASEDIR=$(dirname "$SCRIPT")
+
+# Activate environment
+export PATH=${BASEDIR}/../bin/bin:${PATH}
+source activate ${BASEDIR}/../bin/envs/rna
 
 # Genetic Map
 wget "https://data.broadinstitute.org/alkesgroup/Eagle/downloads/tables/genetic_map_hg19_withX.txt.gz"
@@ -22,3 +27,6 @@ done
 bcftools concat ${FILES} | bcftools annotate --rename-chrs rename.chrs - | bcftools view -O b -o sites.bcf -m2 -M2 -G --types snps,indels -
 bcftools index sites.bcf
 rm rename.chrs
+
+# Deactivate environment
+source deactivate
