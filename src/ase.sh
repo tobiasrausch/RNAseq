@@ -64,6 +64,15 @@ alfred split -i -r ${HG} -v ${OP}.asein.bcf -p ${OP}.haplotagged.bam -s ${VCFID}
 # Create ASE table
 alfred ase -p -f -r ${HG} -v ${OP}.asein.bcf -s ${VCFID} -a ${OP}.ase.tsv.gz ${OP}.haplotagged.bam
 
+# Annotate ASE table
+zcat ${OP}.ase.tsv.gz | tail -n +2 | awk '{print $1"\t"$2"\t"($2+1)"\tID"NR;}' > ${OP}.ase.bed
+alfred annotate -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.anno.bed ${OP}.ase.bed
+rm ${OP}.ase.bed
+paste <(zcat ${OP}.ase.tsv.gz | head -n 1) <(head -n 1 ${OP}.anno.bed | cut -f 5,6) > ${OP}.ase.tsv
+paste <(zcat ${OP}.ase.tsv.gz | tail -n +2 | sed 's/\tNA\tNA\tNA/\tNA\tNA/' | sort -k1,1V -k2,2n) <(tail -n +2 ${OP}.anno.bed | sort -k1,1V -k2,2n | cut -f 5,6) >> ${OP}.ase.tsv
+rm ${OP}.anno.bed ${OP}.ase.tsv.gz
+gzip ${OP}.ase.tsv
+
 # Clean-up
 rm ${OP}.asein.bcf ${OP}.asein.bcf.csi ${OP}.haplotagged.bam ${OP}.haplotagged.bam.bai
 
