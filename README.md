@@ -15,7 +15,7 @@ Download the GTF annotation file
 
 Download the 1000 Genomes Reference Panel for allele-specific expression
 
-cd refpanel/ && ./download_1kGP_hg19.sh
+`cd refpanel/ && ./download_1kGP_hg19.sh`
 
 
 RNA-Seq Alignment and Gene Counting
