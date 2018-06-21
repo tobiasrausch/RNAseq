@@ -4,6 +4,7 @@ rna.slurm_submit.sh
 .envs
 bin/
 genome/
+refpanel/
 example/
 gtf/
 *~
