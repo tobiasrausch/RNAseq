@@ -22,7 +22,7 @@ BAM=${2}
 OUTP=${3}
 
 # Freebayes
-freebayes --no-partial-observations --min-repeat-entropy 1 --report-genotype-likelihood-max --min-alternate-fraction 0.15 --fasta-reference ${GENOME} --genotype-qualities ${BAM} -v ${OUTP}.vcf
+freebayes --no-indels --no-mnps --no-complex --no-partial-observations --min-repeat-entropy 1 --report-genotype-likelihood-max --min-alternate-fraction 0.15 --fasta-reference ${GENOME} --genotype-qualities ${BAM} -v ${OUTP}.vcf
 bgzip ${OUTP}.vcf
 tabix ${OUTP}.vcf.gz
 
