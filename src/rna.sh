@@ -29,3 +29,9 @@ ${BASEDIR}/align.sh ${FQ1} ${FQ2} ${OUTP}
 
 # Call variants
 ${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}
+
+# Phase variants
+${BASEDIR}/phase.sh ${OUTP}.norm.filtered.vcf.gz ${OUTP}
+
+# ASE using phased variants
+${BASEDIR}/ase.sh ${HG} ${OUTP}.star.bam ${OUTP}.eagle2.bcf ${OUTP}

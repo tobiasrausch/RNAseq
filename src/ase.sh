@@ -34,15 +34,21 @@ SIZE=`echo ${BAMID} | awk '{print length($1);}'`
 
 # Find matching VCF sample
 VCFID="NA"
-for I in `seq ${SIZE} -1 1`
-do
-    PREFIX=`echo ${BAMID} | cut -c 1-${I}`
-    if [ `bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10- | tr '\t' '\n' | grep "^${PREFIX}" | wc -l` -eq 1 ]
-    then
-	VCFID=`bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10- | tr '\t' '\n' | grep "^${PREFIX}"`
-	break
-    fi
-done
+if [ `bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10- | tr '\t' '\n' | wc -l` -eq 1 ]
+then
+    # Only one sample, assume it is matching
+    VCFID=`bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10`
+else
+    for I in `seq ${SIZE} -1 1`
+    do
+	PREFIX=`echo ${BAMID} | cut -c 1-${I}`
+	if [ `bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10- | tr '\t' '\n' | grep "^${PREFIX}" | wc -l` -eq 1 ]
+	then
+	    VCFID=`bcftools view ${VCF} | grep -m 1 "^#CHROM" | cut -f 10- | tr '\t' '\n' | grep "^${PREFIX}"`
+	    break
+	fi
+    done
+fi
 
 # Matching samples found?
 if [ ${VCFID} == "NA" ]
