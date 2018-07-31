@@ -54,6 +54,7 @@ samtools flagstat ${OP}.star.bam > ${OP}.flagstat
 alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
 alfred count_rna -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
 alfred count_rna -n fpkm -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm ${OP}.star.bam
+alfred count_rna -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm_uq ${OP}.star.bam
 
 # Create browser tracks
 alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
