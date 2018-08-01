@@ -50,11 +50,11 @@ samtools index ${OP}.star.bam
 samtools idxstats ${OP}.star.bam > ${OP}.idxstats
 samtools flagstat ${OP}.star.bam > ${OP}.flagstat
 
-# Run QC and gene counting using Alfred
+# Run QC and gene counting using Alfred (check which strand option applies to your RNA-Seq kit)
 alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
-alfred count_rna -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
-alfred count_rna -n fpkm -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm ${OP}.star.bam
-alfred count_rna -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm_uq ${OP}.star.bam
+alfred count_rna -s 2 -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
+alfred count_rna -s 2 -n fpkm -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm ${OP}.star.bam
+alfred count_rna -s 2 -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm_uq ${OP}.star.bam
 
 # Create browser tracks
 alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
