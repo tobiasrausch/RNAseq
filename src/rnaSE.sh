@@ -10,7 +10,7 @@ then
     echo "Contact: Tobias Rausch (rausch@embl.de)"
     echo "**********************************************************************"
     echo ""
-    echo "Usage: $0 <read.fq.gz> <output prefix>"
+    echo "Usage: $0 <read.fq.gz> <output prefix> <strand [0|1|2]>"
     echo ""
     exit -1
 fi
@@ -21,10 +21,11 @@ BASEDIR=$(dirname "$SCRIPT")
 # CMD parameters
 FQ=${1}
 OUTP=${2}
+STRAND=${3}
 HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 
 # Align
-${BASEDIR}/alignSE.sh ${FQ} ${OUTP}
+${BASEDIR}/alignSE.sh ${FQ} ${OUTP} ${STRAND}
 
 # Call variants
 ${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}

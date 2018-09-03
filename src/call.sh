@@ -32,7 +32,7 @@ tabix ${OUTP}.norm.vcf.gz
 rm ${OUTP}.vcf.gz ${OUTP}.vcf.gz.tbi
 
 # Fixed threshold filtering
-bcftools filter -O z -o ${OUTP}.norm.filtered.vcf.gz -e '%QUAL<=20 || %QUAL/AO<=2 || SAF<=2 || SAR<=2' ${OUTP}.norm.vcf.gz
+bcftools filter -O z -o ${OUTP}.norm.filtered.vcf.gz -e '%QUAL<=20 || %QUAL/AO<=2' ${OUTP}.norm.vcf.gz
 tabix ${OUTP}.norm.filtered.vcf.gz
 rm ${OUTP}.norm.vcf.gz ${OUTP}.norm.vcf.gz.tbi
 

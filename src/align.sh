@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then
     echo ""
-    echo "Usage: $0 <read1.fq.gz> <read2.fq.gz> <output prefix>"
+    echo "Usage: $0 <read1.fq.gz> <read2.fq.gz> <output prefix> <strand [0|1|2]>"
     echo ""
     exit -1
 fi
@@ -20,6 +20,7 @@ THREADS=4
 FQ1=${1}
 FQ2=${2}
 OP=${3}
+STRAND=${4}
 HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
 
 # Fastqc
@@ -52,9 +53,9 @@ samtools flagstat ${OP}.star.bam > ${OP}.flagstat
 
 # Run QC and gene counting using Alfred (check which strand option applies to your RNA-Seq kit)
 alfred qc -r ${HG} -o ${OP}.alfred.tsv.gz ${OP}.star.bam
-alfred count_rna -s 2 -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
-alfred count_rna -s 2 -n fpkm -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm ${OP}.star.bam
-alfred count_rna -s 2 -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm_uq ${OP}.star.bam
+alfred count_rna -s ${STRAND} -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.count ${OP}.star.bam
+alfred count_rna -s ${STRAND} -n fpkm -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm ${OP}.star.bam
+alfred count_rna -s ${STRAND} -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh37.75.gtf.gz -o ${OP}.gene.fpkm_uq ${OP}.star.bam
 
 # Create browser tracks
 alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
