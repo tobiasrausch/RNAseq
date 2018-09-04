@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]
+if [ $# -ne 3 ]
 then
     echo "**********************************************************************"
     echo "RNA-Seq analysis pipeline."
