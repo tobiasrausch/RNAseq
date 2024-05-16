@@ -2,11 +2,13 @@ rna.slurm_submit.sh
 .mamba
 .tools
 .check
+.strelka
 mamba/
 genome/
 refpanel/
 example/
 gtf/
+strelka-*/
 *~
 
 # Prerequisites

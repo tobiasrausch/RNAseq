@@ -58,5 +58,4 @@ alfred count_rna -s ${STRAND} -n fpkm_uq -g ${BASEDIR}/../gtf/Homo_sapiens.GRCh3
 
 # Create browser tracks
 alfred tracks -o ${OP}.bedGraph.gz ${OP}.star.bam
-igvtools totdf ${OP}.bedGraph.gz ${OP}.tdf hg19
 

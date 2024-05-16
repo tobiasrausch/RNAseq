@@ -20,22 +20,16 @@ GENOME=${1}
 BAM=${2}
 OUTP=${3}
 
-# Freebayes
-freebayes --no-partial-observations --min-repeat-entropy 1 --report-genotype-likelihood-max --min-alternate-fraction 0.15 --fasta-reference ${GENOME} --genotype-qualities ${BAM} -v ${OUTP}.vcf
-bgzip ${OUTP}.vcf
-tabix ${OUTP}.vcf.gz
+# Strelka2
+python2.7 /opt/dev/RNASeq/strelka-2.9.10.centos6_x86_64/bin/configureStrelkaGermlineWorkflow.py --rna --referenceFasta=${GENOME} --bam=${BAM} --runDir=strelka_${OUTP}
+python2.7 strelka_${OUTP}/runWorkflow.py -m local -j ${THREADS}
 
 # Normalize VCF
-bcftools norm -O z -o ${OUTP}.norm.vcf.gz -f ${GENOME} -m -both ${OUTP}.vcf.gz
-tabix ${OUTP}.norm.vcf.gz
-rm ${OUTP}.vcf.gz ${OUTP}.vcf.gz.tbi
-
-# Fixed threshold filtering
-bcftools filter -O z -o ${OUTP}.norm.filtered.vcf.gz -e '%QUAL<=20 || %QUAL/AO<=2' ${OUTP}.norm.vcf.gz
-tabix ${OUTP}.norm.filtered.vcf.gz
-rm ${OUTP}.norm.vcf.gz ${OUTP}.norm.vcf.gz.tbi
+bcftools view -f 'PASS,.' strelka_${OUTP}/results/variants/genome.S1.vcf.gz | bcftools norm -O b -o ${OUTP}.norm.bcf -f ${GENOME} -m -both -
+bcftools index ${OUTP}.norm.bcf
 
 # Subset to coding regions
-bcftools view -T ${BASEDIR}/../gtf/coding.hg38.bed ${OUTP}.norm.filtered.bcf | bgzip > ${OUTP}.vcf.gz
+bcftools view -T ${BASEDIR}/../gtf/coding.hg38.bed ${OUTP}.norm.bcf | bgzip > ${OUTP}.vcf.gz
 tabix ${OUTP}.vcf.gz
-rm ${OUTP}.norm.filtered.bcf ${OUTP}.norm.filtered.bcf.csi
+rm ${OUTP}.norm.bcf ${OUTP}.norm.bcf.csi
+rm -rf strelka_${OUTP}/
