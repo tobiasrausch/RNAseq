@@ -12,8 +12,7 @@ SCRIPT=$(readlink -f "$0")
 BASEDIR=$(dirname "$SCRIPT")
 
 # Activate environment
-export PATH=${BASEDIR}/../bin/bin:${PATH}
-source activate ${BASEDIR}/../bin/envs/rna
+export PATH=${BASEDIR}/../mamba/bin:${PATH}
 
 # CMD params
 THREADS=4
@@ -22,7 +21,7 @@ BAM=${2}
 OUTP=${3}
 
 # Freebayes
-freebayes --no-indels --no-mnps --no-complex --no-partial-observations --min-repeat-entropy 1 --report-genotype-likelihood-max --min-alternate-fraction 0.15 --fasta-reference ${GENOME} --genotype-qualities ${BAM} -v ${OUTP}.vcf
+freebayes --no-partial-observations --min-repeat-entropy 1 --report-genotype-likelihood-max --min-alternate-fraction 0.15 --fasta-reference ${GENOME} --genotype-qualities ${BAM} -v ${OUTP}.vcf
 bgzip ${OUTP}.vcf
 tabix ${OUTP}.vcf.gz
 
@@ -36,5 +35,7 @@ bcftools filter -O z -o ${OUTP}.norm.filtered.vcf.gz -e '%QUAL<=20 || %QUAL/AO<=
 tabix ${OUTP}.norm.filtered.vcf.gz
 rm ${OUTP}.norm.vcf.gz ${OUTP}.norm.vcf.gz.tbi
 
-# Deactivate environment
-source deactivate
+# Subset to coding regions
+bcftools view -T ${BASEDIR}/../gtf/coding.hg38.bed ${OUTP}.norm.filtered.bcf | bgzip > ${OUTP}.vcf.gz
+tabix ${OUTP}.vcf.gz
+rm ${OUTP}.norm.filtered.bcf ${OUTP}.norm.filtered.bcf.csi

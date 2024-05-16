@@ -23,13 +23,20 @@ FQ1=${1}
 FQ2=${2}
 OUTP=${3}
 STRAND=${4}
-HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
+HG=${BASEDIR}/../genome/GRCh38.fa
 
 # Align
-${BASEDIR}/align.sh ${FQ1} ${FQ2} ${OUTP} ${STRAND}
+if [ ! -f ${OUTP}.star.bam ]
+then
+    ${BASEDIR}/align.sh ${FQ1} ${FQ2} ${OUTP} ${STRAND}
+fi
 
 # Call variants
-${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}
+if [ ! -f ${OUTP}.vcf.gz ]
+then
+    ${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}
+fi
+exit;
 
 # Phase variants
 ${BASEDIR}/phase.sh ${OUTP}.norm.filtered.vcf.gz ${OUTP}

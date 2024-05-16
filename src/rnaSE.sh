@@ -22,13 +22,19 @@ BASEDIR=$(dirname "$SCRIPT")
 FQ=${1}
 OUTP=${2}
 STRAND=${3}
-HG=${BASEDIR}/../genome/Homo_sapiens.GRCh37.75.dna.primary_assembly.fa
+HG=${BASEDIR}/../genome/GRCh38.fa
 
 # Align
-${BASEDIR}/alignSE.sh ${FQ} ${OUTP} ${STRAND}
+if [ ! -f ${OUTP}.bam ]
+then
+    ${BASEDIR}/alignSE.sh ${FQ} ${OUTP} ${STRAND}
+fi
 
 # Call variants
-${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}
+if [ ! -f ${OUTP}.vcf.gz ]
+then
+    ${BASEDIR}/call.sh ${HG} ${OUTP}.star.bam ${OUTP}
+fi
 
 # Phase variants
 ${BASEDIR}/phase.sh ${OUTP}.norm.filtered.vcf.gz ${OUTP}

@@ -11,4 +11,4 @@ then
 fi
 
 # Run RNA-seq processing
-../src/rna.sh ERR188040_1.fastq.gz ERR188040_2.fastq.gz HG00096
+../src/rna.sh ERR188040_1.fastq.gz ERR188040_2.fastq.gz HG00096 0
