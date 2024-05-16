@@ -1,9 +1,8 @@
 rna.slurm_submit.sh
-.channels
-.conda
-.envs
-.eagle
-bin/
+.mamba
+.tools
+.check
+mamba/
 genome/
 refpanel/
 example/
